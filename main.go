@@ -1,11 +1,15 @@
 package main
 import (
-	"bytes"
-	"fmt"
+	"io"
+	"net"
+	"os"
 )
 
 func main() {
-	var buffer bytes.Buffer
-	buffer.Write([]byte("bytes.Buffer.example\n"))
-	fmt.Printf(buffer.String())
+	conn, err := net.Dial("tcp", "ascii.jp:80")
+	if err != nil {
+		panic(err)
+	}
+	conn.Write([]byte("GET / HTTP/1.0\r\nHost: ascii.jp\r\n\r\n"))
+	io.Copy(os.Stdout, conn)
 }
