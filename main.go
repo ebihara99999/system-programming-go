@@ -1,24 +1,21 @@
 package main
 
 import (
-	"bufio"
 	"io"
-	"net"
-	"net/http"
 	"os"
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "ascii.jp:80")
+	oldFile, err := os.Open("old.txt")
 	if err != nil {
 		panic(err)
 	}
+	defer oldFile.Close()
 
-	conn.Write([]byte("GET / HTTP/1.1\r\nHost: ascii.jp\r\n\r\n"))
-	res, err := http.ReadResponse(bufio.NewReader(conn), nil)
+	newFile, err := os.Create("new.txt")
 	if err != nil {
 		panic(err)
 	}
-	defer res.Body.Close()
-	io.Copy(os.Stdout, res.Body)
+	defer newFile.Close()
+	io.Copy(newFile, oldFile)
 }
