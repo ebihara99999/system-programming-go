@@ -1,21 +1,16 @@
 package main
 
 import (
+	"crypto/rand"
 	"io"
 	"os"
 )
 
 func main() {
-	oldFile, err := os.Open("old.txt")
+	file, err := os.Create("random_contents.txt")
 	if err != nil {
 		panic(err)
 	}
-	defer oldFile.Close()
-
-	newFile, err := os.Create("new.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer newFile.Close()
-	io.Copy(newFile, oldFile)
+	defer file.Close()
+	io.CopyN(file, rand.Reader, 1024)
 }
