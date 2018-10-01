@@ -1,16 +1,31 @@
 package main
 
 import (
-	"crypto/rand"
+	"archive/zip"
 	"io"
 	"os"
+	"strings"
 )
 
 func main() {
-	file, err := os.Create("random_contents.txt")
+	file, err := os.Create("new.zip")
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
-	io.CopyN(file, rand.Reader, 1024)
+
+	zipWriter := zip.NewWriter(file)
+	defer zipWriter.Close()
+
+	firstFile, err := zipWriter.Create("first.txt")
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(firstFile, strings.NewReader("first contents"))
+
+	secondFile, err := zipWriter.Create("second.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	io.Copy(secondFile, strings.NewReader("second contents"))
 }
