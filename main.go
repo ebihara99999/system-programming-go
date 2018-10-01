@@ -3,29 +3,30 @@ package main
 import (
 	"archive/zip"
 	"io"
-	"os"
+	"net/http"
 	"strings"
 )
 
-func main() {
-	file, err := os.Create("new.zip")
-	if err != nil {
-		panic(err)
-	}
+func handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Disposition", "attachment; filename=ascii_sample.zip")
 
-	zipWriter := zip.NewWriter(file)
+	zipWriter := zip.NewWriter(w)
 	defer zipWriter.Close()
-
-	firstFile, err := zipWriter.Create("first.txt")
+	firstFile, err := zipWriter.Create("a.txt")
 	if err != nil {
 		panic(err)
 	}
-	io.Copy(firstFile, strings.NewReader("first contents"))
+	io.Copy(firstFile, strings.NewReader("hogehoge"))
 
-	secondFile, err := zipWriter.Create("second.txt")
+	secondFile, err := zipWriter.Create("b.txt")
 	if err != nil {
 		panic(err)
 	}
+	io.Copy(secondFile, strings.NewReader("fugaguga"))
+}
 
-	io.Copy(secondFile, strings.NewReader("second contents"))
+func main() {
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
 }
